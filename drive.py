@@ -1,55 +1,37 @@
 import argparse
-import base64
+import base64 #For encoding/decoding data
 from datetime import datetime
 import os
-import shutil
+import shutil # High level File Operations
 
 import numpy as np
-import socketio
-import eventlet
+import socketio # Lowlevel networking interface
+import eventlet #concurrent networking library similiar to threading
 import eventlet.wsgi
-from PIL import Image
-from flask import Flask
+from PIL import Image # Python Umaging Library
+from flask import Flask # Miniwebframe work for python
 from io import BytesIO
+import cv2 # Open CV
 
 from keras.models import load_model
-import h5py
-from keras import __version__ as keras_version
 
 sio = socketio.Server()
 app = Flask(__name__)
 model = None
 prev_image_array = None
 
+def img_resize(image,new_size):
+    return cv2.resize(image,(new_size[0],new_size[1]), interpolation=cv2.INTER_AREA)
 
-class SimplePIController:
-    def __init__(self, Kp, Ki):
-        self.Kp = Kp
-        self.Ki = Ki
-        self.set_point = 0.
-        self.error = 0.
-        self.integral = 0.
-
-    def set_desired(self, desired):
-        self.set_point = desired
-
-    def update(self, measurement):
-        # proportional error
-        self.error = self.set_point - measurement
-
-        # integral error
-        self.integral += self.error
-
-        return self.Kp * self.error + self.Ki * self.integral
-
-
-controller = SimplePIController(0.1, 0.002)
-set_speed = 9
-controller.set_desired(set_speed)
-
+def img_crop(image,y_crop):
+    # img[y:y+h, x:x+w] -> 35 from top until 130 in bottom
+    image = image[y_crop[0]:y_crop[1], 0:image.shape[1]]
+    return image
 
 @sio.on('telemetry')
 def telemetry(sid, data):
+    y_crop = (50,140)  # Cropping Size
+    new_size = (200,66) # New size after Resizing
     if data:
         # The current steering angle of the car
         steering_angle = data["steering_angle"]
@@ -60,11 +42,11 @@ def telemetry(sid, data):
         # The current image from the center camera of the car
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
-        image_array = np.asarray(image)
-        steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
-
-        throttle = controller.update(float(speed))
-
+        image_raw = np.asarray(image)
+        image_crop = img_crop(image_raw,y_crop)
+        image_rz = img_resize(image_crop,new_size)
+        steering_angle = float(model.predict(image_rz[None, :, :, :], batch_size=1))
+        throttle = 0.15
         print(steering_angle, throttle)
         send_control(steering_angle, throttle)
 
@@ -109,15 +91,6 @@ if __name__ == '__main__':
         help='Path to image folder. This is where the images from the run will be saved.'
     )
     args = parser.parse_args()
-
-    # check that model Keras version is same as local Keras version
-    f = h5py.File(args.model, mode='r')
-    model_version = f.attrs.get('keras_version')
-    keras_version = str(keras_version).encode('utf8')
-
-    if model_version != keras_version:
-        print('You are using Keras version ', keras_version,
-              ', but the model was built using ', model_version)
 
     model = load_model(args.model)
 
