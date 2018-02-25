@@ -1,6 +1,6 @@
-#**Behavioral Cloning** 
+# **Behavioral Cloning** 
 
-##Writeup for Project Submission
+## Writeup for Project Submission
 
 **Behavrioal Cloning Project**
 
@@ -13,7 +13,7 @@ The goals / steps of this project are the following:
 * Summarize the results with a written report
 
 
-[//]: # (Image References)
+[//]: # "Image References"
 
 [image3]: ./writeup/randombrightness.png "Brigntness Image"
 [image4]: ./writeup/randomTranslation.png "randomTranslation Image"
@@ -26,9 +26,9 @@ The goals / steps of this project are the following:
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
 ---
-###Files Submitted & Code Quality
+### Files Submitted & Code Quality
 
-####1. Submission includes all required files and can be used to run the simulator in autonomous mode
+#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following files:
 
@@ -38,19 +38,19 @@ My project includes the following files:
 * **writeup_report.md** summarizing the results
 * **video.mp4** to visualize Autonomous driving for a lap.
 
-####2. Submssion includes functional code
+#### 2. Submssion includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing
 ```
 python drive.py model.h5
 ```
 I tested the code in anaconda windows enviornment .
-####3. Submssion code is usable and readable
+#### 3. Submssion code is usable and readable
 
 The model.py file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training, the augmentation i added for training the network and validating the model. It contains comments to explain how the code works.
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. An appropriate model arcthiecture has been employed
+#### 1. An appropriate model arcthiecture has been employed
 
 I used the NVDIA End to End Deep Learning Model as proposed in this [paper](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/)
 
@@ -62,26 +62,26 @@ Additionally i used a keras lambda layer to Normalize the images between -1 and 
 
 
 
-####2. Attempts to reduce overfitting in the model
+#### 2. Attempts to reduce overfitting in the model
 
 The model contains dropout layers (a bit aggressively)  in order to reduce overfitting (model.py lines 197,202,206).
 I used a dropout of 50 % in all the Fully connected layers so that the network dont form too much memory of the track and try to over fit. 
 
 The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 215-218). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
-####3. Model parameter tuning
+#### 3. Model parameter tuning
 
 The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 214).
 
-####4. Appropriate training data
+#### 4. Appropriate training data
 
 Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
 
 I used the Udacity training data.I found the training data from Udacity had more data for steering angle zero.(Driving straight). I went ahead and removed the straight steering data (Zero) to avoid the neural network developing a bias towards driving straight.
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. Solution Design Approach
+#### 1. Solution Design Approach
 
 The overall strategy for deriving a model architecture was to use an existing  standard model as base and further tune on that model to make the car drive on the track autonomously.
 
@@ -104,7 +104,7 @@ Time to add more dropouts to prevent overfitting. Initially i added 20 % , 30% a
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
-####2. Final Model Architecture
+#### 2. Final Model Architecture
 
 The  model consists of a 5 convolution neural network with filter sizes 5x5 and 3x3, and depths between 24 and 64 (model.py lines 170-188) and 4 Fully connected layer (model.py lines 195-210)
 
@@ -115,7 +115,7 @@ Here is a visualization of the architecture
 
 ![alt text][image8]
 
-####3. Creation of the Training Set & Training Process
+#### 3. Creation of the Training Set & Training Process
 
 I started with the Udacity provided data set.
 
